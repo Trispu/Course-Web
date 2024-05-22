@@ -1,17 +1,22 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Image, Input, Modal, Select, Table, Upload } from "antd"
+import { Button, Form, Image, Input, Modal, Popconfirm, Select, Table, Upload } from "antd"
 import { useForm } from "antd/es/form/Form";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import uploadFile from "../../utils/upload";
 import "./index.scss";
-import Header from "../../components/header";
+
 
 function CourseManagement() {
   const [form]=useForm();
   const [dataSource,setDataSource] = useState([]);
   const[isOpen,setIsOpen] = useState(false);
-  
+  const handleDelete=async(id) =>{
+    const response= await axios.delete(`https://6627a8deb625bf088c09302d.mockapi.io/Course/${id}`);
+    console.log(response);
+    const listAfterDelete= dataSource.filter((course)=>course.id!==id);
+    setDataSource(listAfterDelete);
+  }
   const columns = [
     {
       title: 'courseName',
@@ -34,6 +39,25 @@ function CourseManagement() {
       dataIndex: 'image',
       key: 'image',
       render:(image)=><Image src={image} width={150}/>
+    },
+    {
+      title: 'Action',
+      dataIndex: 'id',
+      key: 'id',
+      render: (id) => <>
+     <Popconfirm
+    title="Delete the task"
+    description="Are you sure to delete this task?"
+    onConfirm={()=>handleDelete(id)}
+  
+    okText="Yes"
+    cancelText="No"
+  >
+    <Button type="primary" danger>
+      Delete
+      </Button>
+  </Popconfirm>
+      </>
     },
   ];
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -104,9 +128,7 @@ form.submit();
   return (
     
     <div className="container11">
-      <div>  
-        <Header/>
-      </div>
+      
       <div className="buttonAdd">
       <Button className="button" type="primary" danger onClick={handleShowModal}>Add new Course</Button>
       </div>
